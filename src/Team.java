@@ -32,6 +32,6 @@ public class Team {
 
     }
     public void addOpponentMatch(Match match) {
-
+        matches.add(match);
     }
 }
