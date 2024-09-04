@@ -15,7 +15,6 @@ public class Match {
     public Team getAwayTeam() {
         return awayTeam;
     }
-    public Boolean isValid(){
-        return !Objects.equals(homeTeam.getNationalAssoc(), awayTeam.getNationalAssoc());
-    }
+
+
 }
