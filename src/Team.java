@@ -23,8 +23,12 @@ public class Team {
     public String getNationalAssoc(){
         return this.nationalAssoc;
     }
-    public Map<Integer,Pot> getPot(){
+    public Map<Integer,Pot> getPotMap(){
         return this.pot;
+    }
+    public Pot getPot(){
+        int key = (this.pot.keySet().hashCode());
+        return this.pot.get(key);
     }
 
     public void addMatch(List<Match> matchList,Pot pot) {
@@ -55,14 +59,12 @@ public class Team {
         // Correctly typed Map.Entry
         for (Map.Entry<Pot, List<Map<String, Match>>> entry : this.fixtureMap.entrySet()) {
             List<Map<String, Match>> matches = entry.getValue();  // Get the list of matches for this pot
-
             // Iterate over the list of fixture maps for each pot
             for (Map<String, Match> matchMap : matches) {
                 // Check if "Away" match exists and add it to the matchList
                 if (matchMap.get("Away") != null) {
                     matchList.add(matchMap.get("Away"));
                 }
-
                 // Check if "Home" match exists and add it to the matchList
                 if (matchMap.get("Home") != null) {
                     matchList.add(matchMap.get("Home"));

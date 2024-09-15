@@ -74,6 +74,7 @@ public class Main {
                         System.out.println(teamDrawn.getTeamName());
                     }
                     if (teamDrawn.getMatchList().size() == 8){
+                        teamsFromPot.remove(teamDrawn);
                         break;
                     }
                     if (teamsFromPot.isEmpty()){
@@ -107,6 +108,9 @@ public class Main {
             if (potExludeList.contains(teamPotDraw)){
                         continue;
             }
+//            if (teamPotDraw.size()==1){
+//                System.out.println("Guess What your guess was right");
+//            }
             List<Team> validTeams = getPossibleOpponents(teamDrawn, teamPotDraw.getPotNo());
             int opposition;
             Match HomeDraw = null;
@@ -117,17 +121,30 @@ public class Main {
             }
             if (potFixtures.get("Home") ==null){
                 opposition = rand.nextInt(validTeams.size());
-                HomeDraw =  new Match(teamDrawn,validTeams.get(opposition));
+                Team homeOpposition  = validTeams.get(opposition);
+                while (homeOpposition.getFixture(teamDrawn.getPot(), "Away")!=null){
+                    opposition = rand.nextInt(validTeams.size());
+                    homeOpposition  = validTeams.get(opposition);
+                }
+                HomeDraw =  new Match(teamDrawn,homeOpposition);
                 validTeams.remove(opposition);
             }
             if (potFixtures.get("Away") == null){
                 opposition = rand.nextInt(validTeams.size());
-                AwayDraw = new Match(validTeams.get(opposition),teamDrawn);
+                Team awayOpposition  = validTeams.get(opposition);
+                while (awayOpposition.getFixture(teamDrawn.getPot(), "Home")!=null){
+                    opposition = rand.nextInt(validTeams.size());
+                    awayOpposition  = validTeams.get(opposition);
+                }
+                AwayDraw =  new Match(awayOpposition,teamDrawn);
                 validTeams.remove(opposition);
             }
-            List<Match> draws = new ArrayList<>();
-            Collections.addAll(draws,HomeDraw,AwayDraw);
-            teamDrawn.addMatch(draws,teamPotDraw);
+            if (HomeDraw != null || AwayDraw !=null){
+                List<Match> draws = new ArrayList<>();
+                Collections.addAll(draws,HomeDraw,AwayDraw);
+                teamDrawn.addMatch(draws,teamPotDraw);
+            }
+
         }
         teamExludeList.add(teamDrawn);
         teamsFromPot.remove(teamDrawn);
