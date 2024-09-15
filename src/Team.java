@@ -3,35 +3,87 @@ import java.util.*;
 public class Team {
     private final String teamName;
     private final String nationalAssoc;
-    private final int potNo;
-    private List<Match> matches;
-    public Team(String teamName, String nationalAssoc, int potNo){
+    private final Map<Integer,Pot> pot =new HashMap<>(1);
+    private final HashMap<Pot, List < Map<String, Match>>> fixtureMap = new HashMap<>();
+    public Team(String teamName, String nationalAssoc, List<Pot> pots, int potNo){
         this.teamName= teamName;
         this.nationalAssoc = nationalAssoc;
-        this.potNo = potNo;
-        this.matches = new ArrayList<>();
+        this.pot.put(potNo,pots.get(potNo-1));
+        for (Pot pot : pots ){
+            fixtureMap.put(pot, new ArrayList<>());
+            Map<String,Match> emptyMap = new HashMap<>();
+            emptyMap.put("Home",null);
+            emptyMap.put("Away",null);
+            fixtureMap.get(pot).add(emptyMap);
+        }
     }
     public String getTeamName(){
-        return teamName;
+        return this.teamName;
     }
     public String getNationalAssoc(){
-        return nationalAssoc;
+        return this.nationalAssoc;
     }
-    public int getPotNo(){
-        return potNo;
+    public Map<Integer,Pot> getPot(){
+        return this.pot;
     }
-    public void addMatch(List<Match> matchList) {
+
+    public void addMatch(List<Match> matchList,Pot pot) {
         for (Match match : matchList){
-            matches.add(match);
+            if (match == null){
+                continue;
+            }
             if (match.getHomeTeam() != this){
-                match.getHomeTeam().addOpponentMatch(match);
+                this.fixtureMap.get(pot).getFirst().replace("Away",match);
+                match.getHomeTeam().addOpponentMatch(match,"Home",this.pot);
             } else if (match.getAwayTeam() != this) {
-                match.getAwayTeam().addOpponentMatch(match);
+                this.fixtureMap.get(pot).getFirst().replace("Home",match);
+                match.getAwayTeam().addOpponentMatch(match,"Away",this.pot);
+            }
+        }
+    }
+    public HashMap<Pot, List < Map<String, Match>>> getFixtureMap(){
+        // when requested if match == null replace with -
+        return this.fixtureMap;
+    }
+    public void addOpponentMatch(Match match, String type,Map<Integer,Pot> pot) {
+        int key = (pot.keySet().hashCode());
+        this.fixtureMap.get(pot.get(key)).getFirst().replace(type,match);
+    }
+    public List<Match> getMatchList() {
+        List<Match> matchList = new ArrayList<>();
+
+        // Correctly typed Map.Entry
+        for (Map.Entry<Pot, List<Map<String, Match>>> entry : this.fixtureMap.entrySet()) {
+            List<Map<String, Match>> matches = entry.getValue();  // Get the list of matches for this pot
+
+            // Iterate over the list of fixture maps for each pot
+            for (Map<String, Match> matchMap : matches) {
+                // Check if "Away" match exists and add it to the matchList
+                if (matchMap.get("Away") != null) {
+                    matchList.add(matchMap.get("Away"));
+                }
+
+                // Check if "Home" match exists and add it to the matchList
+                if (matchMap.get("Home") != null) {
+                    matchList.add(matchMap.get("Home"));
+                }
             }
         }
 
+        return matchList;
     }
-    public void addOpponentMatch(Match match) {
-        matches.add(match);
+    public Match getFixture(Pot pot, String type){
+        return (this.fixtureMap.get(pot).getFirst().get(type));
+
+    }
+    public void clearFixtureList(List<Pot> pots,int potNo){
+        this.pot.put(potNo,pots.get(potNo-1));
+        for (Pot pot : pots ){
+            fixtureMap.put(pot, new ArrayList<>());
+            Map<String,Match> emptyMap = new HashMap<>();
+            emptyMap.put("Home",null);
+            emptyMap.put("Away",null);
+            fixtureMap.get(pot).add(emptyMap);
+        }
     }
 }

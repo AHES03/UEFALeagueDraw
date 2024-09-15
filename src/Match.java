@@ -16,5 +16,14 @@ public class Match {
         return awayTeam;
     }
 
+    public Team getOpponent(Team mainTeam){
+        if (this.homeTeam == mainTeam){
+            return awayTeam;
+        }else if (this.awayTeam ==mainTeam){
+            return homeTeam;
+        }else{
+            return null;
+        }
+    }
 
 }
