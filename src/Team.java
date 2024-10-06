@@ -5,16 +5,22 @@ public class Team {
     private final String nationalAssoc;
     private final Map<Integer,Pot> pot =new HashMap<>(1);
     private final HashMap<Pot, List < Map<String, Match>>> fixtureMap = new HashMap<>();
+    private final HashMap<Pot, Map<String, List<Team>>>validTeams= new HashMap<>();
     public Team(String teamName, String nationalAssoc, List<Pot> pots, int potNo){
         this.teamName= teamName;
         this.nationalAssoc = nationalAssoc;
         this.pot.put(potNo,pots.get(potNo-1));
         for (Pot pot : pots ){
             fixtureMap.put(pot, new ArrayList<>());
-            Map<String,Match> emptyMap = new HashMap<>();
-            emptyMap.put("Home",null);
-            emptyMap.put("Away",null);
-            fixtureMap.get(pot).add(emptyMap);
+            validTeams.put(pot, new HashMap<>());
+            Map<String, List<Team>> emptyMapValidTeams = new HashMap<>();
+            Map<String,Match> emptyMapFixtures = new HashMap<>();
+            emptyMapValidTeams.put("Home", new ArrayList<>());
+            emptyMapValidTeams.put("Away", new ArrayList<>());
+            emptyMapFixtures.put("Home",null);
+            emptyMapFixtures.put("Away",null);
+            fixtureMap.get(pot).add(emptyMapFixtures);
+            validTeams.put(pot, emptyMapValidTeams);
         }
     }
     public String getTeamName(){
@@ -87,5 +93,19 @@ public class Team {
             emptyMap.put("Away",null);
             fixtureMap.get(pot).add(emptyMap);
         }
+    }
+    public void addValidTeams(Pot pot){
+        List<Team> potTeams =pot.getTeams();
+        List<Team> validTeams =new ArrayList<>();
+        for (Team team : potTeams){
+            if (team == this){
+                continue;
+            }
+            if (!Objects.equals(team.getNationalAssoc(), this.nationalAssoc)){
+                validTeams.add(team);
+            }
+        }
+        this.validTeams.get(pot).put("Home",validTeams);
+        this.validTeams.get(pot).put("Away",validTeams);
     }
 }

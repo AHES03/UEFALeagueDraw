@@ -45,6 +45,7 @@ public class Main {
         int currentPot = 0; //Index 0 == Pot 1
         Pot pot = potList.get(currentPot);  // Get the current Pot
         teamsFromPot = new ArrayList<>(pot.getTeams());
+        createValidTeamsMaps();
         while (!input.equals("EXIT")){
             if (!validInput.contains(input)){
                 System.out.print("Invalid input please enter a correct value \n");
@@ -210,5 +211,18 @@ public class Main {
                 .filter(team -> team.getMatchList().size()<8)
                 .filter(team -> !filteredNationalAssoc.contains(team.getNationalAssoc()))
                 .collect(Collectors.toList()));
+    }
+    public static void createValidTeamsMaps(){
+        for (Pot potSelected :potList){
+            List<Team> potTeam =potSelected.getTeams();
+            for (Team team:potTeam){
+                for (Pot pot :potList){
+                    team.addValidTeams(pot);
+                }
+            }
+        }
+    }
+    public void checkDeadlocks(){
+
     }
 }
